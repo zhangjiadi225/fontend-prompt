@@ -1,11 +1,10 @@
 {
   "name": "@jdzhang225gmail/fontend-prompt",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": false,
   "type": "module",
   "bin": {
-    "fontend-prompt": "./dist/index.js",
-    "fontend-skill": "./dist/cli.js"
+    "fontend-prompt": "./dist/cli.js"
   },
   "files": [
     "dist",
@@ -17,11 +16,10 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/index.js",
+    "start": "node dist/cli.js",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0",
     "cac": "^6.7.14",
     "npm": "^11.7.0"
   },

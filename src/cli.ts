@@ -10,7 +10,7 @@ import * as fs from "fs/promises";
 // 读取 package.json 获取版本号
 // const pkg = JSON.parse(await fs.readFile(new URL("../package.json", import.meta.url), "utf-8"));
 // 为了避免 ESM 路径问题，暂时硬编码，或者用 simple import
-const version = "0.1.0";
+const version = "0.2.0";
 
 const cli = cac("fontend-skill");
 

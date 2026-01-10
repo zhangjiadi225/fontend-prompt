@@ -1,103 +1,78 @@
-# 前端提示词 Skills & MCP Server
+# 前端提示词 Skills (CLI)
 
-这是一个**前端开发辅助工具库**，它既可以作为 **Skills (CLI 工具)** 使用（零 Token 消耗，适合 Agent 直接调用），也可以作为标准的 **MCP Server** 使用。
+这是一个**前端开发辅助 CLI 工具**。它通过**零 Token 消耗**的本地分析，将模糊的需求转化为**专业、结构化、带审批流的前端开发方案**，供 Agent 或开发者直接使用。
 
-它致力于把模糊的需求转化为**专业、结构化、带审批流的前端开发方案**。
+## 🌟 核心特性
 
-## 🌟 核心理念：Skills vs MCP
-
--   **Skills (CLI 模式)**: 🚀 **推荐！** Agent 通过命令行直接运行工具。 **优点**：无需在 Prompt 中挂载巨量的工具定义，极大节省 Token；运行速度快；无常驻进程。
--   **MCP Server 模式**: 经典模式，适合 Claude Desktop 等标准 MCP 客户端。
+- **纯 CLI 工具**: 无需常驻服务，即用即走。
+- **节省 Token**: 本地扫描项目结构，无需将整个文件树塞入 Context。
+- **结构化输出**: 生成包含文件变更、审批关口、校验步骤的标准 Prompt。
 
 ---
 
-## 🚀 快速开始 (CLI / Skills)
+## 🚀 安装 (推荐)
 
-无需安装，直接使用 `npx` 运行：
+为了获得极速体验（避免每次 `npx` 下载），请**全局安装**：
+
+```bash
+npm install -g @jdzhang225gmail/fontend-prompt
+```
+
+安装后，即可使用 `fontend-prompt` 命令。
+
+---
+
+## 📖 使用指南
 
 ### 1. 扫描项目 (Scan)
 快速了解项目架构、技术栈与关键文件。
 
 ```bash
-npx @jdzhang225gmail/fontend-prompt scan
+fontend-prompt scan
 # 或指定目录
-npx @jdzhang225gmail/fontend-prompt scan --depth 2
+fontend-prompt scan --depth 2
 ```
 
 ### 2. 优化需求 (Optimize)
-将你的“一句话需求”转化为详细的开发方案（包含文件变更、审批关口等）。
+将你的“一句话需求”转化为详细的开发方案。
 
 ```bash
-npx @jdzhang225gmail/fontend-prompt optimize "给后台增加一个用户管理页面"
+fontend-prompt optimize "给后台增加一个用户管理页面"
 ```
 
 ### 3. 评分 (Score)
 看看你的 Prompt 写得好不好，缺什么信息。
 
 ```bash
-npx @jdzhang225gmail/fontend-prompt score "帮我写个页面"
+fontend-prompt score "帮我写个页面"
 ```
 
 ---
 
 ## 🤖 在 Agent 中使用 (Antigravity / Claude Code)
 
-### 方式一：作为 CLI 工具（最省 Token）
+为了让 Agent 更流畅地调用本工具，请告诉它直接使用命令行。
 
-告诉你的 Agent（或者写在 `.cursorrules` / `.agent/workflows` 中）：
+**添加到 `.cursorrules` 或 Agent 系统提示词：**
 
-> "当需要理解项目结构时，请运行命令 `npx @jdzhang225gmail/fontend-prompt scan`。"
-> "当需要规划新功能时，请运行命令 `npx @jdzhang225gmail/fontend-prompt optimize '<需求>'`，并根据输出结果执行。"
-
-### 方式二：作为库集成
-
-如果你在编写 TS 脚本或 Agent 插件：
-
-```typescript
-import { scanProject, optimizeFrontendPrompt } from "@jdzhang225gmail/fontend-prompt";
-
-const tree = await scanProject({ rootDir: "." });
-const plan = optimizeFrontendPrompt({ userPrompt: "..." });
-```
+> "当需要理解项目结构时，请运行命令 `fontend-prompt scan`。"
+> "当需要规划新功能时，请运行命令 `fontend-prompt optimize '<需求>'`，并根据输出结果执行。"
 
 ---
 
-## 📦 安装与构建
+## 📦 本地开发与构建
 
-如果你想本地部署或二次开发：
+如果你想二次开发：
 
 ```bash
 npm install
 npm run build
 
-# 本地运行 CLI
-npm run skill -- --help
+# 本地测试
+node dist/cli.js --help
 ```
 
 ---
-
-## 🛠️ MCP Server 配置
-
-如果你仍希望在 Claude Desktop 中作为常驻服务使用：
-
-```json
-{
-  "mcpServers": {
-    "frontend-helper": {
-      "command": "npx",
-      "args": ["-y", "@jdzhang225gmail/fontend-prompt"]
-    }
-  }
-}
-```
-
----
-
-## 功能特性
-
--   **中文优先**: 所有输出、文档、注释默认均为中文。
--   **Gate 机制**: 在关键节点（设计/计划/验收）生成审批关口，防止 AI 一条路走到黑。
--   **安全扫描**: 自动识别项目目录，但严格限制在 CWD 下访问。
 
 ## 许可
 
