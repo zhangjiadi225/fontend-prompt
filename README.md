@@ -1,223 +1,104 @@
-# 前端提示词流程 MCP Server
+# 前端提示词 Skills & MCP Server
 
-这是一个 Model Context Protocol（MCP）服务，用于**标准化前端开发的提示词与工作流**。
+这是一个**前端开发辅助工具库**，它既可以作为 **Skills (CLI 工具)** 使用（零 Token 消耗，适合 Agent 直接调用），也可以作为标准的 **MCP Server** 使用。
 
-它可以把质量参差不齐的用户问题，转换为更适合 AI 安全执行的**结构化、带审批关口（gate）的方案**：
+它致力于把模糊的需求转化为**专业、结构化、带审批流的前端开发方案**。
 
-- **先理解项目**（扫描目录树）
-- **按任务类型套模板**（新功能 / 优化 / 重构 / 等）
-- **审批关口**（宿主在每个 gate 处拦截并让用户确认）
-- **TypeScript 校验 + 验收流程**
-- **条件触发的文档更新**（仅当存在 `claude.md/CLAUDE.md` 时）
+## 🌟 核心理念：Skills vs MCP
 
-本服务使用 **stdio**（最主流、最容易配置的 MCP 部署方式），应由 MCP 宿主（例如 Claude Desktop）启动。
+-   **Skills (CLI 模式)**: 🚀 **推荐！** Agent 通过命令行直接运行工具。 **优点**：无需在 Prompt 中挂载巨量的工具定义，极大节省 Token；运行速度快；无常驻进程。
+-   **MCP Server 模式**: 经典模式，适合 Claude Desktop 等标准 MCP 客户端。
 
 ---
 
-## 环境要求
+## 🚀 快速开始 (CLI / Skills)
 
-- 建议 Node.js 18+
+无需安装，直接使用 `npx` 运行：
+
+### 1. 扫描项目 (Scan)
+快速了解项目架构、技术栈与关键文件。
+
+```bash
+npx @jdzhang225gmail/fontend-prompt scan
+# 或指定目录
+npx @jdzhang225gmail/fontend-prompt scan --depth 2
+```
+
+### 2. 优化需求 (Optimize)
+将你的“一句话需求”转化为详细的开发方案（包含文件变更、审批关口等）。
+
+```bash
+npx @jdzhang225gmail/fontend-prompt optimize "给后台增加一个用户管理页面"
+```
+
+### 3. 评分 (Score)
+看看你的 Prompt 写得好不好，缺什么信息。
+
+```bash
+npx @jdzhang225gmail/fontend-prompt score "帮我写个页面"
+```
 
 ---
 
-## 安装与构建
+## 🤖 在 Agent 中使用 (Antigravity / Claude Code)
+
+### 方式一：作为 CLI 工具（最省 Token）
+
+告诉你的 Agent（或者写在 `.cursorrules` / `.agent/workflows` 中）：
+
+> "当需要理解项目结构时，请运行命令 `npx @jdzhang225gmail/fontend-prompt scan`。"
+> "当需要规划新功能时，请运行命令 `npx @jdzhang225gmail/fontend-prompt optimize '<需求>'`，并根据输出结果执行。"
+
+### 方式二：作为库集成
+
+如果你在编写 TS 脚本或 Agent 插件：
+
+```typescript
+import { scanProject, optimizeFrontendPrompt } from "@jdzhang225gmail/fontend-prompt";
+
+const tree = await scanProject({ rootDir: "." });
+const plan = optimizeFrontendPrompt({ userPrompt: "..." });
+```
+
+---
+
+## 📦 安装与构建
+
+如果你想本地部署或二次开发：
 
 ```bash
 npm install
 npm run build
+
+# 本地运行 CLI
+npm run skill -- --help
 ```
-
-运行（仅用于调试）：
-
-```bash
-npm start
-```
-
-> 注意：直接运行该服务不会出现交互界面。MCP Server 通常会等待宿主通过 stdio 发送 JSON-RPC 消息。
 
 ---
 
-## 在 MCP 宿主中配置（stdio）
+## 🛠️ MCP Server 配置
 
-### 推荐（最方便）：使用 npx 启动（无需下载源码）
-
-- **command**：`npx`（Windows 某些宿主需要写 `npx.cmd`）
-- **args**：`["-y", "<你的npm包名>@<版本>"]`
+如果你仍希望在 Claude Desktop 中作为常驻服务使用：
 
 ```json
 {
   "mcpServers": {
-    "@jdzhang225gmail/fontend-prompt": {
+    "frontend-helper": {
       "command": "npx",
-      "args": ["-y", "@jdzhang225gmail/fontend-prompt@0.1.0"]
+      "args": ["-y", "@jdzhang225gmail/fontend-prompt"]
     }
   }
 }
 ```
 
-### 推荐（稳定）：运行构建后的产物
-
-使用 **Node** 运行 `dist/index.js`。
-
-- **command**：`node`
-- **args**：`["d:/web/mcp/dist/index.js"]`
-
-### Claude Desktop 示例（Windows）
-
-在 Claude Desktop 的 MCP 配置中添加类似内容：
-
-```json
-{
-  "mcpServers": {
-    "@jdzhang225gmail/fontend-prompt": {
-      "command": "node",
-      "args": ["d:/web/mcp/dist/index.js"]
-    }
-  }
-}
-```
-
-> Claude Desktop 配置文件的具体位置/名称可能随版本变化。关键是：**宿主通过 `node dist/index.js` 启动这个服务**。
-
 ---
 
-## 工具
+## 功能特性
 
-### 1) `scan_project`
-
-扫描项目目录（只读），输出目录树，并检测是否存在 `claude.md/CLAUDE.md`。
-
-**入参**
-
-```json
-{
-  "rootDir": ".",
-  "maxDepth": 4,
-  "maxEntries": 1200
-}
-```
-
-**出参（JSON 文本）**
-
-- `tree`：目录树
-- `hasClaudeMd`：是否存在 `claude.md/CLAUDE.md`
-- `claudeMdPaths`：命中的路径
-- `suggestedFiles`：检测到的关键配置文件
-
-### 2) `optimize_frontend_prompt`
-
-将原始用户问题转换为一个**提示词包**，包含：
-
-- `messages`：可直接喂给 AI 的 `system` + `user` 消息
-- `workflow`：机器可解析的步骤与 gate
-- `guardrails`：约束与限制条件
-- `clarifyingQuestions`：继续执行前需要追问的澄清问题
-
-**关键入参**
-
-- `userPrompt`（必填）
-- `taskType`：
-  - `new_feature`
-  - `optimize_existing`
-  - `refactor`
-  - `bugfix`
-  - `performance`
-  - `ui_polish`
-  - `dependency_upgrade`
-  - `test_addition`
-- `requireApprovalGates`（默认 `true`）：强制在 gate 处停下等待用户确认
-- 可选的技术栈提示：`framework`、`language`、`styling`、`router` 等
-
-**示例入参**
-
-```json
-{
-  "userPrompt": "给后台新增一个用户列表页面，支持搜索、分页、编辑弹窗",
-  "taskType": "new_feature",
-  "language": "ts",
-  "framework": "React",
-  "styling": "TailwindCSS",
-  "requireApprovalGates": true
-}
-```
-
-**重要出参字段（重要字段）**
-
-- `workflow.gates[]`：审批关口列表
-- `messages[]`：标准化后的提示词
-
-### 3) `score_frontend_prompt`
-
-对提示词质量评分，并识别缺失信息。
-
-**入参**
-
-```json
-{ "prompt": "..." }
-```
-
-**出参**
-
-- `score`（0-100）
-- `missing[]`
-- `suggestions[]`
-
----
-
-## 宿主编排（最佳实践）
-
-为了让 gate 更可靠、做到“像主流 MCP 一样好用”，建议采用：**由宿主拦截**。
-
-### Gate 标记（拦截信号）
-
-强制模板中包含机器可解析标记：
-
-- Gate 开始：
-
-```text
-<<<MCP:GATE id="new_feature_design" action="WAIT_FOR_USER_APPROVAL">>>
-```
-
-- Gate 停止（推荐把它作为宿主拦截触发信号）：
-
-```text
-<<<MCP:WAIT gate_id="new_feature_design" action="WAIT_FOR_USER_APPROVAL">>>
-```
-
-### 推荐的宿主行为
-
-1. 调用 `scan_project`（获取目录树 + `hasClaudeMd`）
-2. 调用 `optimize_frontend_prompt`
-3. 将返回的 `messages` 喂给你的 AI
-4. 当 AI 输出包含 `<<<MCP:WAIT ...>>>`：
-   - 宿主停止继续
-   - 询问用户：**同意 / 调整 / 取消**
-5. 用户同意后 -> 宿主开启下一轮 AI，对应 gate 之后的步骤继续执行
-
----
-
-## 说明 / 常见问题（FAQ）
-
-### 1) `scan_project` 的 rootDir
-
-出于安全考虑，`scan_project.rootDir` 必须位于**服务进程的工作目录（cwd）**之内。
-
-因此，通常建议宿主用**目标前端项目根目录作为工作目录（cwd）**来启动这个 MCP 服务。
-
-### 2) 为什么使用 stdio？
-
-stdio 是 MCP 宿主里支持最广、也最容易配置的传输方式。
-
----
-
-## 开发
-
-```bash
-npm run dev
-```
-
----
+-   **中文优先**: 所有输出、文档、注释默认均为中文。
+-   **Gate 机制**: 在关键节点（设计/计划/验收）生成审批关口，防止 AI 一条路走到黑。
+-   **安全扫描**: 自动识别项目目录，但严格限制在 CWD 下访问。
 
 ## 许可
 
-默认：私有 / 内部使用。
+MIT

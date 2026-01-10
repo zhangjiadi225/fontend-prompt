@@ -4,7 +4,8 @@
   "private": false,
   "type": "module",
   "bin": {
-    "fontend-prompt": "./dist/cli.js"
+    "fontend-prompt": "./dist/index.js",
+    "fontend-skill": "./dist/cli.js"
   },
   "files": [
     "dist",
@@ -21,6 +22,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
+    "cac": "^6.7.14",
     "npm": "^11.7.0"
   },
   "devDependencies": {
