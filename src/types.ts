@@ -24,14 +24,14 @@ export type OptimizeArgs = {
   constraints?: string[];
   /** 任务类型 */
   taskType?:
-    | "new_feature"
-    | "optimize_existing"
-    | "refactor"
-    | "bugfix"
-    | "performance"
-    | "ui_polish"
-    | "dependency_upgrade"
-    | "test_addition";
+  | "new_feature"
+  | "optimize_existing"
+  | "refactor"
+  | "bugfix"
+  | "performance"
+  | "ui_polish"
+  | "dependency_upgrade"
+  | "test_addition";
   /** 输出语言 */
   outputLanguage?: "zh" | "en";
   /** 输出格式 */
@@ -49,14 +49,7 @@ export type ScoreArgs = {
   prompt: string;
 };
 
-export type ScanProjectArgs = {
-  /** 根目录路径 */
-  rootDir?: string;
-  /** 最大扫描深度 */
-  maxDepth?: number;
-  /** 最大文件条目数 */
-  maxEntries?: number;
-};
+
 
 export type WorkflowGate = {
   id: string;

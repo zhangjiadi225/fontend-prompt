@@ -5,7 +5,7 @@
 ## 🌟 核心特性
 
 - **纯 CLI 工具**: 无需常驻服务，即用即走。
-- **节省 Token**: 本地扫描项目结构，无需将整个文件树塞入 Context。
+
 - **结构化输出**: 生成包含文件变更、审批关口、校验步骤的标准 Prompt。
 
 ---
@@ -24,23 +24,15 @@ npm install -g @jdzhang225gmail/fontend-prompt
 
 ## 📖 使用指南
 
-### 1. 扫描项目 (Scan)
-快速了解项目架构、技术栈与关键文件。
 
-```bash
-fontend-prompt scan
-# 或指定目录
-fontend-prompt scan --depth 2
-```
-
-### 2. 优化需求 (Optimize)
+### 1. 优化需求 (Optimize)
 将你的“一句话需求”转化为详细的开发方案。
 
 ```bash
 fontend-prompt optimize "给后台增加一个用户管理页面"
 ```
 
-### 3. 评分 (Score)
+### 2. 评分 (Score)
 看看你的 Prompt 写得好不好，缺什么信息。
 
 ```bash
@@ -55,7 +47,7 @@ fontend-prompt score "帮我写个页面"
 
 **添加到 `.cursorrules` 或 Agent 系统提示词：**
 
-> "当需要理解项目结构时，请运行命令 `fontend-prompt scan`。"
+
 > "当需要规划新功能时，请运行命令 `fontend-prompt optimize '<需求>'`，并根据输出结果执行。"
 
 ---

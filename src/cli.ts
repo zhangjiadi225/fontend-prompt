@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { cac } from "cac";
-import { scanProject } from "./skills/scan.js";
+
 import { buildOptimizedPromptPackage } from "./skills/optimize.js";
 import { scoreFrontendPrompt } from "./skills/score.js";
 import { OptimizeArgs } from "./types.js";
@@ -10,27 +10,11 @@ import * as fs from "fs/promises";
 // 读取 package.json 获取版本号
 // const pkg = JSON.parse(await fs.readFile(new URL("../package.json", import.meta.url), "utf-8"));
 // 为了避免 ESM 路径问题，暂时硬编码，或者用 simple import
-const version = "0.2.0";
+const version = "0.3.0";
 
 const cli = cac("fontend-skill");
 
-cli
-    .command("scan [root]", "扫描项目目录结构与关键文件")
-    .option("--depth <number>", "最大目录深度", { default: 4 })
-    .option("--entries <number>", "最大文件条目数", { default: 1200 })
-    .action(async (root, options) => {
-        try {
-            const result = await scanProject({
-                rootDir: root,
-                maxDepth: options.depth,
-                maxEntries: options.entries,
-            });
-            console.log(JSON.stringify(result, null, 2));
-        } catch (e: any) {
-            console.error("扫描失败:", e.message);
-            process.exit(1);
-        }
-    });
+
 
 cli
     .command("optimize <prompt>", "将原始需求转化为结构化 Prompt")
