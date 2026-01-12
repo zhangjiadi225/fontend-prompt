@@ -1,4 +1,4 @@
-import { ChatMessage, OptimizeArgs, WorkflowGate, WorkflowStep } from "../types.js";
+import { ChatMessage, OptimizeArgs, WorkflowGate, WorkflowStep, OptimizedPromptPackage } from "../types.js";
 import { includesAny } from "../utils.js";
 
 /**
@@ -7,8 +7,10 @@ import { includesAny } from "../utils.js";
 function buildFrontendGuardrails(args: OptimizeArgs): string[] {
     const guardrails: string[] = [
         "输出必须面向前端开发实践（UI、交互、状态、路由、可访问性、性能、工程化），不要泛泛而谈。",
-        "如果关键信息不足，先提出澄清问题，不要凭空编造业务规则或接口字段。",
-        "除非明确要求，否则不要引入新的第三方依赖；如果必须引入，要说明原因与替代方案。",
+        "如果关键信息不足，**严禁**凭空捏造业务逻辑，必须立刻停止并反问用户。",
+        "禁止在没有明确理由的情况下引入新的 npm 包，优先使用原生 API 或现有依赖。",
+        "禁止输出 '占位符' 代码（如 `// ...rest of code`），除非文件超过 200 行，否则必须输出完整代码。",
+        "禁止在 tsx/jsx 中编写内联长逻辑，必须提取为 hook 或 helper 函数。",
         "给出可执行的交付物（代码/文件结构/命令/步骤），避免只给概念。",
         "优先考虑可维护性：类型、安全边界、错误处理、可测试性与可扩展性。",
         "遵循安全与隐私：不要输出或要求提供密钥、token、个人敏感信息。",
@@ -148,20 +150,21 @@ function buildStructuredTemplate(args: OptimizeArgs) {
     const workflow = buildWorkflowDefinition(args);
 
     const gateLine = requireApprovalGates
-        ? "- 在标注为 **[GATE: NEED USER APPROVAL]** 的位置必须停止输出后续内容，等待用户明确回复“同意/调整”。"
+        ? "- 遇到 `<<<MCP:GATE ...>>>` 标记时，**必须完全停止生成**。严禁输出后续章节的任何字符，直到用户明确回复“同意/继续”。"
         : "- 允许一次性输出完整内容，但仍需标注原本的 gate 节点。";
 
     const base = [
         "# 输出结构（必须严格遵守）",
         "## - Machine readable workflow",
         `- mcp_workflow: ${JSON.stringify({ task_type: workflow.taskType, require_approval_gates: workflow.requireApprovalGates, gates: workflow.gates }, null, 0)}`,
-        `- gate_marker_prefix: ${workflow.gateMarker} id=\"...\" action=\"WAIT_FOR_USER_APPROVAL\">>>`,
+        `- gate_marker_prefix: ${workflow.gateMarker} id="..." action="WAIT_FOR_USER_APPROVAL">>>`,
         "## 0. 任务分类",
         "- task_type: <new_feature|optimize_existing|refactor|bugfix|performance|ui_polish|dependency_upgrade|test_addition>",
         "- 目标: <一句话>",
         "- 非目标: <明确不做什么>",
         "",
         "## 1. 项目理解（必须先做）",
+        "- 显式陈述你对当前项目架构的理解（技术栈/目录结构/关键约定）。",
         "- 如果你还不了解项目结构：先调用工具 `scan_project` 获取目录树与关键文件，然后基于结果总结架构。",
         "- 列出与你要改动最相关的文件/目录（最多 10 个）。",
         "- 如需进一步定位：提出要用户提供的入口文件/路由/组件/接口契约。",
@@ -180,6 +183,7 @@ function buildStructuredTemplate(args: OptimizeArgs) {
             ...base,
             "",
             "<<<MCP:GATE id=\"new_feature_design\" action=\"WAIT_FOR_USER_APPROVAL\">>>",
+            "🔴 STOP GENERATING HERE. WAIT FOR USER APPROVAL.",
             "## 3. 新功能设计方案 **[GATE: NEED USER APPROVAL]**",
             "- 用户故事/验收标准（可测试、可验收）",
             "- UI/交互说明（状态：loading/empty/error/success）",
@@ -191,6 +195,7 @@ function buildStructuredTemplate(args: OptimizeArgs) {
             "<<<MCP:WAIT gate_id=\"new_feature_design\" action=\"WAIT_FOR_USER_APPROVAL\">>>",
             "",
             "<<<MCP:GATE id=\"new_feature_plan\" action=\"WAIT_FOR_USER_APPROVAL\">>>",
+            "🔴 STOP GENERATING HERE. WAIT FOR USER APPROVAL.",
             "## 4. 开发方案与 TODO 流程 **[GATE: NEED USER APPROVAL]**",
             "- 开发步骤（可分 PR/commit 阶段）",
             "- TODO 列表（使用 Markdown checklist）",
@@ -206,6 +211,7 @@ function buildStructuredTemplate(args: OptimizeArgs) {
                 : "- 如非 TS 项目则跳过此步骤。",
             "",
             "<<<MCP:GATE id=\"new_feature_accept\" action=\"WAIT_FOR_USER_APPROVAL\">>>",
+            "🔴 STOP GENERATING HERE. WAIT FOR USER APPROVAL.",
             "## 7. 交付与验收 **[GATE: NEED USER APPROVAL]**",
             "- 给出验收清单（按验收标准逐条核对）",
             "- 提示用户验收：通过/不通过/需要调整",
@@ -226,6 +232,7 @@ function buildStructuredTemplate(args: OptimizeArgs) {
             "- 列出当前痛点（性能/可维护性/体验/bug 风险）",
             "",
             "<<<MCP:GATE id=\"opt_change_doc\" action=\"WAIT_FOR_USER_APPROVAL\">>>",
+            "🔴 STOP GENERATING HERE. WAIT FOR USER APPROVAL.",
             "## 4. 变更说明文档（Markdown） **[GATE: NEED USER APPROVAL]**",
             "- 标题：<优化主题>",
             "- Before：当前行为与问题点",
@@ -237,6 +244,7 @@ function buildStructuredTemplate(args: OptimizeArgs) {
             "<<<MCP:WAIT gate_id=\"opt_change_doc\" action=\"WAIT_FOR_USER_APPROVAL\">>>",
             "",
             "<<<MCP:GATE id=\"opt_plan\" action=\"WAIT_FOR_USER_APPROVAL\">>>",
+            "🔴 STOP GENERATING HERE. WAIT FOR USER APPROVAL.",
             "## 5. 实施计划与 TODO **[GATE: NEED USER APPROVAL]**",
             "- TODO checklist",
             "- 测试/验证计划",
@@ -421,7 +429,7 @@ function buildClarifyingQuestions(args: OptimizeArgs): string[] {
 /**
  * 核心逻辑：将用户的 raw prompt 转换为优化的 prompt package。
  */
-export function buildOptimizedPromptPackage(args: OptimizeArgs) {
+export function buildOptimizedPromptPackage(args: OptimizeArgs): OptimizedPromptPackage {
     const outputLanguage = args.outputLanguage ?? "zh";
     const outputFormat = args.outputFormat ?? "both";
     const codeStyle = args.codeStyle ?? "diff";
@@ -437,8 +445,15 @@ export function buildOptimizedPromptPackage(args: OptimizeArgs) {
     const system: string[] = [];
     system.push(
         outputLanguage === "zh"
-            ? "你是资深前端工程师与技术负责人。你的任务是把需求落地为高质量、可维护、可测试的实现方案与代码。"
-            : "You are a senior frontend engineer/tech lead. Turn requirements into high-quality, maintainable, testable plans and code.",
+            ? `你是由 Google DeepMind 研发的 Elite Frontend Agent。你不仅是资深工程师，更是追求极致代码美学与工程规范的技术专家。
+
+你的核心思维模式：
+1. **First Principles**: 不要照搬现有代码，思考最适合当前场景的方案。
+2. **Security First**: 默认假设输入是不安全的，必须做校验。
+3. **Performance Obsessed**: 对任何可能导致重渲染或阻塞主线程的操作保持敏感。
+
+你的任务是把需求落地为**达到生产环境标准**的代码。这意味着：代码必须包含完整的类型定义、错误处理、边界情况覆盖，并符合现代前端最佳实践。`
+            : "You are an Elite Frontend Agent. Your task is to implement requirements with production-grade quality, including full types, error handling, and best practices.",
     );
     system.push(
         outputLanguage === "zh"

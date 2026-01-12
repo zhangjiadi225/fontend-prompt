@@ -1,10 +1,10 @@
-import { ScoreArgs } from "../types.js";
+import { ScoreArgs, ScoreResult } from "../types.js";
 import { clamp, includesAny } from "../utils.js";
 
 /**
  * 对前端提示词质量进行评分，并识别缺失信息。
  */
-export function scoreFrontendPrompt(args: ScoreArgs) {
+export function scoreFrontendPrompt(args: ScoreArgs): ScoreResult {
     const prompt = args.prompt.trim();
     const lower = prompt.toLowerCase();
 

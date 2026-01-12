@@ -49,8 +49,6 @@ export type ScoreArgs = {
   prompt: string;
 };
 
-
-
 export type WorkflowGate = {
   id: string;
   title: string;
@@ -62,3 +60,52 @@ export type WorkflowStep = {
   title: string;
   gateId?: string;
 };
+
+export interface OptimizedPromptPackage {
+  optimizedPrompt: string;
+  messages: ChatMessage[];
+  workflow: {
+    taskType: string;
+    requireApprovalGates: boolean;
+    gateMarker: string;
+    gates: WorkflowGate[];
+    steps: WorkflowStep[];
+  };
+  guardrails: string[];
+  clarifyingQuestions: string[];
+  checklist: string[];
+  meta: {
+    framework: string | null;
+    techStack: string | null;
+    language: string | null;
+    styling: string | null;
+    stateManagement: string | null;
+    router: string | null;
+    taskType: string;
+    requireApprovalGates: boolean;
+    outputLanguage: "zh" | "en";
+    outputFormat: "step_by_step" | "direct" | "both";
+    codeStyle: "diff" | "full_files" | "snippets";
+  };
+  /**
+   * Skill 执行的思考路径 (Markdown)
+   */
+  thought_trace?: string;
+}
+
+export interface ScoreResult {
+  score: number;
+  breakdown: {
+    clarity: number;
+    context: number;
+    constraints: number;
+    qualityBars: number;
+    process: number;
+  };
+  missing: string[];
+  suggestions: string[];
+  /**
+   * Skill 执行的思考路径 (Markdown)
+   */
+  thought_trace?: string;
+}
