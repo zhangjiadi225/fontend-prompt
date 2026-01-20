@@ -24,19 +24,12 @@ npm install -g @jdzhang225gmail/fontend-prompt
 
 ## 📖 使用指南
 
-
 ### 1. 优化需求 (Optimize)
+
 将你的“一句话需求”转化为详细的开发方案。
 
 ```bash
 fontend-prompt optimize "给后台增加一个用户管理页面"
-```
-
-### 2. 评分 (Score)
-看看你的 Prompt 写得好不好，缺什么信息。
-
-```bash
-fontend-prompt score "帮我写个页面"
 ```
 
 ---
@@ -46,7 +39,6 @@ fontend-prompt score "帮我写个页面"
 为了让 Agent 更流畅地调用本工具，请告诉它直接使用命令行。
 
 **添加到 `.cursorrules` 或 Agent 系统提示词：**
-
 
 > "当需要规划新功能时，请运行命令 `fontend-prompt optimize '<需求>'`，并根据输出结果执行。"
 

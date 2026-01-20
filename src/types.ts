@@ -24,14 +24,14 @@ export type OptimizeArgs = {
   constraints?: string[];
   /** 任务类型 */
   taskType?:
-  | "new_feature"
-  | "optimize_existing"
-  | "refactor"
-  | "bugfix"
-  | "performance"
-  | "ui_polish"
-  | "dependency_upgrade"
-  | "test_addition";
+    | "new_feature"
+    | "optimize_existing"
+    | "refactor"
+    | "bugfix"
+    | "performance"
+    | "ui_polish"
+    | "dependency_upgrade"
+    | "test_addition";
   /** 输出语言 */
   outputLanguage?: "zh" | "en";
   /** 输出格式 */
@@ -42,11 +42,6 @@ export type OptimizeArgs = {
   mustAskClarifyingQuestions?: boolean;
   /** 是否需要审批关口 */
   requireApprovalGates?: boolean;
-};
-
-export type ScoreArgs = {
-  /** 待评分的提示词 */
-  prompt: string;
 };
 
 export type WorkflowGate = {
@@ -87,23 +82,6 @@ export interface OptimizedPromptPackage {
     outputFormat: "step_by_step" | "direct" | "both";
     codeStyle: "diff" | "full_files" | "snippets";
   };
-  /**
-   * Skill 执行的思考路径 (Markdown)
-   */
-  thought_trace?: string;
-}
-
-export interface ScoreResult {
-  score: number;
-  breakdown: {
-    clarity: number;
-    context: number;
-    constraints: number;
-    qualityBars: number;
-    process: number;
-  };
-  missing: string[];
-  suggestions: string[];
   /**
    * Skill 执行的思考路径 (Markdown)
    */
