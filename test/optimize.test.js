@@ -47,5 +47,6 @@ describe('Optimize Skill Integration Test', () => {
         });
         ok(result.guardrails.length > 0);
         ok(result.optimizedPrompt.includes('Security First'), 'Should contain core guardrails'); 
+        ok(result.optimizedPrompt.includes('Context7'), 'Should contain Context7 instruction');
     });
 });

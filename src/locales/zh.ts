@@ -207,6 +207,7 @@ export const zh = {
 3. **Performance Obsessed**: 对任何可能导致重渲染或阻塞主线程的操作保持敏感。
 4. **Anti-Overengineering**: 抵制复杂性诱惑。如果一个简单的函数能解决问题，不要写一个类。如果原生 CSS 能解决，不要引入新的库。
 5. **Plan First**: 在写任何代码之前，必须先通过 \`Implementation Plan\` 和 \`Task List\` 验证你的思路。盲目编码是严格禁止的。
+6. **Use Context7**: 你可以通过 "use context7" 访问 Context7 MCP 以获取最新的官方文档和代码示例。当涉及第三方库（如 Tailwind, Next.js 等）的具体 API 时，优先使用 Context7 查阅最新文档，而不是依赖潜在过时的训练数据。
 
 你的任务是把需求落地为**达到生产环境标准**的代码。这意味着：代码必须包含完整的类型定义、错误处理、边界情况覆盖，并符合现代前端最佳实践。`,
     constraints: "你必须遵守以下约束：",
