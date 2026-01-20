@@ -1,10 +1,10 @@
 {
-  "name": "@jdzhang225gmail/fontend-prompt",
+  "name": "@jdzhang225gmail/frontend-prompt",
   "version": "0.5.0",
   "private": false,
   "type": "module",
   "bin": {
-    "fontend-prompt": "./dist/cli.js"
+    "frontend-prompt": "./dist/cli.js"
   },
   "files": [
     "dist",

@@ -14,7 +14,7 @@ const require = createRequire(import.meta.url);
 const pkg = require("../package.json");
 const version = pkg.version;
 
-const cli = cac("fontend-skill");
+const cli = cac("frontend-prompt");
 
 function printSkillBanner(skillName: string) {
   console.error(`============= [Frontend Prompt Skill] =============`);

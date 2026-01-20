@@ -29,7 +29,7 @@ export function formatThoughtPath(
 # 🧠 思考路径: ${skill}
 
 > **时间**: ${timestamp}
-> **工具**: \`@fontend-prompt/${skill.toLowerCase().replace(/\s+/g, "-")}\`
+> **工具**: \`@frontend-prompt/${skill.toLowerCase().replace(/\s+/g, "-")}\`
 
 ## 1. 🔍 原始输入分析
 ${inputSummary}

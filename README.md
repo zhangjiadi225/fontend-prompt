@@ -17,10 +17,10 @@
 为了获得极速体验（避免每次 `npx` 下载），请**全局安装**：
 
 ```bash
-npm install -g @jdzhang225gmail/fontend-prompt
+npm install -g @jdzhang225gmail/frontend-prompt
 ```
 
-安装后，即可使用 `fontend-prompt` 命令。
+安装后，即可使用 `frontend-prompt` 命令。
 
 ---
 
@@ -31,7 +31,7 @@ npm install -g @jdzhang225gmail/fontend-prompt
 将你的“一句话需求”转化为详细的开发方案。
 
 ```bash
-fontend-prompt optimize "给后台增加一个用户管理页面"
+frontend-prompt optimize "给后台增加一个用户管理页面"
 ```
 
 #### 按需输出字段
@@ -40,10 +40,10 @@ fontend-prompt optimize "给后台增加一个用户管理页面"
 
 ```bash
 # 只获取优化后的 Prompt 和工作流
-fontend-prompt optimize "Add login" --fields optimizedPrompt,workflow
+frontend-prompt optimize "Add login" --fields optimizedPrompt,workflow
 
 # 输出纯 JSON（不包含调试信息）
-fontend-prompt optimize "Add login" --fields optimizedPrompt
+frontend-prompt optimize "Add login" --fields optimizedPrompt
 ```
 
 支持的字段：`optimizedPrompt`, `messages`, `workflow`, `guardrails`, `clarifyingQuestions`, `checklist`, `meta`, `thought_trace`。
@@ -56,7 +56,7 @@ fontend-prompt optimize "Add login" --fields optimizedPrompt
 
 **添加到 `.cursorrules` 或 Agent 系统提示词：**
 
-> "当遇到前端开发任务（包括新功能、重构、Bug修复、UI优化等）时，请务必先运行命令 `fontend-prompt optimize '<需求>' --fields optimizedPrompt,workflow`，并严格按照其生成的结构化方案执行。"
+> "当遇到前端开发任务（包括新功能、重构、Bug修复、UI优化等）时，请务必先运行命令 `frontend-prompt optimize '<需求>' --fields optimizedPrompt,workflow`，并严格按照其生成的结构化方案执行。"
 
 **如果你是在本项目源码中开发（Local Clone）：**
 
