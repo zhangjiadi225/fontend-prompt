@@ -1,6 +1,6 @@
 {
   "name": "@jdzhang225gmail/fontend-prompt",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": false,
   "type": "module",
   "bin": {

@@ -6,6 +6,8 @@
 
 - **纯 CLI 工具**: 无需常驻服务，即用即走。
 
+- **环境感知**: 自动识别当前目录的技术栈（Framework, Language, Styling 等），无需手动传参。
+
 - **结构化输出**: 生成包含文件变更、审批关口、校验步骤的标准 Prompt。
 
 ---
@@ -32,15 +34,33 @@ npm install -g @jdzhang225gmail/fontend-prompt
 fontend-prompt optimize "给后台增加一个用户管理页面"
 ```
 
+#### 按需输出字段
+
+为了节省 AI 上下文，你可以指定只输出需要的 JSON 字段：
+
+```bash
+# 只获取优化后的 Prompt 和工作流
+fontend-prompt optimize "Add login" --fields optimizedPrompt,workflow
+
+# 输出纯 JSON（不包含调试信息）
+fontend-prompt optimize "Add login" --fields optimizedPrompt
+```
+
+支持的字段：`optimizedPrompt`, `messages`, `workflow`, `guardrails`, `clarifyingQuestions`, `checklist`, `meta`, `thought_trace`。
+
 ---
 
 ## 🤖 在 Agent 中使用 (Antigravity / Claude Code)
 
-为了让 Agent 更流畅地调用本工具，请告诉它直接使用命令行。
+为了让 Agent 更流畅地调用本工具，请告诉它直接使用命令行，并**按需获取数据**以节省 Token。
 
 **添加到 `.cursorrules` 或 Agent 系统提示词：**
 
-> "当需要规划新功能时，请运行命令 `fontend-prompt optimize '<需求>'`，并根据输出结果执行。"
+> "当遇到前端开发任务（包括新功能、重构、Bug修复、UI优化等）时，请务必先运行命令 `fontend-prompt optimize '<需求>' --fields optimizedPrompt,workflow`，并严格按照其生成的结构化方案执行。"
+
+**如果你是在本项目源码中开发（Local Clone）：**
+
+> "请使用本地路径调用：`node dist/cli.js optimize '<需求>' --fields optimizedPrompt,workflow`"
 
 ---
 
