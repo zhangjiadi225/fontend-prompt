@@ -7,7 +7,7 @@ import { buildWorkflowDefinition } from "./workflow.js";
 import { buildFrontendGuardrails } from "./guardrails.js";
 import { buildClarifyingQuestions } from "./questions.js";
 import { buildStructuredTemplate } from "./template.js";
-import { getLocale } from "../../i18n.js";
+import { DEFAULT_DATA } from "../default-data.js";
 
 /**
  * 核心逻辑：将用户的 raw prompt 转换为优化的 prompt package。
@@ -21,7 +21,7 @@ export function buildOptimizedPromptPackage(
   const mustAskClarifyingQuestions = args.mustAskClarifyingQuestions ?? true;
   const taskType = args.taskType ?? "new_feature";
   const requireApprovalGates = args.requireApprovalGates ?? true;
-  const t = getLocale(outputLanguage).core;
+  const t = DEFAULT_DATA.core;
 
   const workflow = buildWorkflowDefinition(args);
 

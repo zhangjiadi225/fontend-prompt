@@ -1,4 +1,4 @@
-export const zh = {
+export const DEFAULT_DATA = {
   guardrails: {
     frontend_practice:
       "输出必须面向前端开发实践（UI、交互、状态、路由、可访问性、性能、工程化），不要泛泛而谈。",
@@ -22,9 +22,8 @@ export const zh = {
       "**禁止隐性假设**: 如果需求未明确（如鉴权、样式库、错误处理），必须在“澄清问题”阶段询问，严禁根据“惯例”自作主张。",
     ts_default:
       "默认使用 TypeScript，类型定义清晰，避免 any；必要时用类型收窄。",
-    framework_practice: (framework: string): string =>
-      `优先使用 ${framework} 的最佳实践与官方推荐写法。`,
-    styling_req: (styling: string): string => `样式实现需符合：${styling}。`,
+    framework_practice: "优先使用 {{framework}} 的最佳实践与官方推荐写法。",
+    styling_req: "样式实现需符合：{{styling}}。",
   },
   questions: {
     framework:
@@ -126,14 +125,14 @@ export const zh = {
     task_list_header: "## 2. 任务清单 (Task List)（细化到文件粒度）",
     project_understanding_header: "## 3. 项目理解",
     project_understanding_desc:
-      "- 显式陈述你对当前项目架构的理解（技术栈/目录结构/关键约定）。\n- 如果你还不了解项目结构：先调用工具 `scan_project` 获取目录树与关键文件，然后基于结果总结架构。\n- 列出与你要改动最相关的文件/目录（最多 10 个）。\n- 如需进一步定位：提出要用户提供的入口文件/路由/组件/接口契约。",
+      "- 显式陈述你对当前项目架构的理解（技术栈/目录结构/关键约定）。\\n- 如果你还不了解项目结构：先调用工具 `scan_project` 获取目录树与关键文件，然后基于结果总结架构。\\n- 列出与你要改动最相关的文件/目录（最多 10 个）。\\n- 如需进一步定位：提出要用户提供的入口文件/路由/组件/接口契约。",
     risk_constraints_header: "## 4. 风险与约束确认",
     risk_constraints_desc:
-      "- 兼容性: 浏览器范围/移动端/SSR/SEO（如适用）\n- 依赖限制: 是否允许新增依赖\n- 质量门槛: a11y/性能/测试要求",
-    gate_instruction: (enabled: boolean): string =>
-      enabled
-        ? "- 遇到 `<<<MCP:GATE ...>>>` 标记时，**必须完全停止生成**。严禁输出后续章节的任何字符，直到用户明确回复“同意/继续”。"
-        : "- 允许一次性输出完整内容，但仍需标注原本的 gate 节点。",
+      "- 兼容性: 浏览器范围/移动端/SSR/SEO（如适用）\\n- 依赖限制: 是否允许新增依赖\\n- 质量门槛: a11y/性能/测试要求",
+    gate_instruction:
+      "- 遇到 `<<<MCP:GATE ...>>>` 标记时，**必须完全停止生成**。严禁输出后续章节的任何字符，直到用户明确回复“同意/继续”。",
+    gate_disabled_instruction:
+      "- 允许一次性输出完整内容，但仍需标注原本的 gate 节点。",
     gate_stop:
       '当你到达 gate 节点并完成该章节后，输出一行：`<<<MCP:WAIT gate_id="<id>" action="WAIT_FOR_USER_APPROVAL">>>`，然后立刻停止。',
     stop_generating: "🔴 STOP GENERATING HERE. WAIT FOR USER APPROVAL.",
@@ -149,16 +148,15 @@ export const zh = {
     verify_plan: "- 验证计划（本地运行/手动测试点/测试用例）",
     code_output:
       "- 按你在第 6 步承诺的方式输出代码（diff/full_files/snippets）",
-    ts_check: (isTs: boolean): string =>
-      isTs
-        ? "- 先执行 TS 校验（例如 tsc --noEmit 或 npm script），贴出关键错误并修复后再继续。"
-        : "- 如非 TS 项目则跳过此步骤。",
+    ts_check:
+      "- 先执行 TS 校验（例如 tsc --noEmit 或 npm script），贴出关键错误并修复后再继续。",
+    ts_check_skip: "- 如非 TS 项目则跳过此步骤。",
     acceptance_check:
-      "- 给出验收清单（按验收标准逐条核对）\n- 提示用户验收：通过/不通过/需要调整",
+      "- 给出验收清单（按验收标准逐条核对）\\n- 提示用户验收：通过/不通过/需要调整",
     doc_update:
-      "- 若 `scan_project` 显示存在 `claude.md/CLAUDE.md`：将本次新功能的描述追加到对应文档的合适位置。\n- 若不存在：跳过文档更新。",
+      "- 若 `scan_project` 显示存在 `claude.md/CLAUDE.md`：将本次新功能的描述追加到对应文档的合适位置。\\n- 若不存在：跳过文档更新。",
     legacy_desc:
-      "- 描述当前功能的输入/输出/关键分支/异常路径\n- 列出当前痛点（性能/可维护性/体验/bug 风险）",
+      "- 描述当前功能的输入/输出/关键分支/异常路径\\n- 列出当前痛点（性能/可维护性/体验/bug 风险）",
     change_doc_items: [
       "- 标题：<优化主题>",
       "- Before：当前行为与问题点",
@@ -169,7 +167,7 @@ export const zh = {
       "- 验收点：如何验证优化确实生效",
     ],
     refactor_scope_desc:
-      "- 列出重构范围内的模块/目录/入口\n- 描述现有结构与主要依赖关系（数据流、组件层级、耦合点）",
+      "- 列出重构范围内的模块/目录/入口\\n- 描述现有结构与主要依赖关系（数据流、组件层级、耦合点）",
     refactor_doc_items: [
       "- Before：当前结构、主要问题",
       "- After：目标结构、约束与原则",
@@ -178,23 +176,23 @@ export const zh = {
       "- 风险与回滚：如何逐步落地",
     ],
     migration_plan_desc:
-      "- 提供一个一次性迁移脚本（js/ts/py）方案：做文件移动、import 路径更新（或至少生成迁移清单）\n- 说明脚本运行方式与注意事项",
+      "- 提供一个一次性迁移脚本（js/ts/py）方案：做文件移动、import 路径更新（或至少生成迁移清单）\\n- 说明脚本运行方式与注意事项",
     refactor_exec:
-      "- 按映射表实施变更\n- 运行 TS 校验/构建/测试（如存在）并修复\n- 输出最终结构与关键文件变化摘要",
-    repro_desc: "- 复现步骤、预期 vs 实际\n- 根因分析（涉及代码位置）",
-    fix_plan_desc: "- 修复点与影响范围\n- 是否需要补充测试用例",
-    verification_desc: "- 输出代码变更\n- 验证结果与回归检查点",
+      "- 按映射表实施变更\\n- 运行 TS 校验/构建/测试（如存在）并修复\\n- 输出最终结构与关键文件变化摘要",
+    repro_desc: "- 复现步骤、预期 vs 实际\\n- 根因分析（涉及代码位置）",
+    fix_plan_desc: "- 修复点与影响范围\\n- 是否需要补充测试用例",
+    verification_desc: "- 输出代码变更\\n- 验证结果与回归检查点",
     perf_metrics:
       "- 明确指标：LCP/CLS/INP/TTI、bundle size、渲染次数、接口耗时等",
-    perf_opt: "- 瓶颈假设与验证方法\n- 改动点与预期收益",
-    perf_compare: "- 输出代码变更\n- Before/After 数据对比",
+    perf_opt: "- 瓶颈假设与验证方法\\n- 改动点与预期收益",
+    perf_compare: "- 输出代码变更\\n- Before/After 数据对比",
     ux_issues: "- 视觉/布局/交互/动效/可访问性问题",
     ux_fix: "- 每个问题的改法与验收点",
-    upgrade_risk: "- 目标依赖/版本区间\n- Breaking changes 风险与迁移成本",
-    upgrade_plan: "- 升级步骤与验证方式\n- 回滚方案",
-    upgrade_exec: "- 输出代码变更\n- 构建/测试/TS 校验结果",
-    test_scope: "- 测试范围与优先级（单测/组件/E2E）\n- 用例列表与覆盖目标",
-    test_exec: "- 输出测试代码与必要的轻量重构\n- 运行结果与覆盖说明",
+    upgrade_risk: "- 目标依赖/版本区间\\n- Breaking changes 风险与迁移成本",
+    upgrade_plan: "- 升级步骤与验证方式\\n- 回滚方案",
+    upgrade_exec: "- 输出代码变更\\n- 构建/测试/TS 校验结果",
+    test_scope: "- 测试范围与优先级（单测/组件/E2E）\\n- 用例列表与覆盖目标",
+    test_exec: "- 输出测试代码与必要的轻量重构\\n- 运行结果与覆盖说明",
     wait_gate_title: "通过 gate 后才输出",
     gate_need_approval: "GATE: NEED USER APPROVAL",
   },
@@ -207,7 +205,6 @@ export const zh = {
 3. **Performance Obsessed**: 对任何可能导致重渲染或阻塞主线程的操作保持敏感。
 4. **Anti-Overengineering**: 抵制复杂性诱惑。如果一个简单的函数能解决问题，不要写一个类。如果原生 CSS 能解决，不要引入新的库。
 5. **Plan First**: 在写任何代码之前，必须先通过 \`Implementation Plan\` 和 \`Task List\` 验证你的思路。盲目编码是严格禁止的。
-6. **Use Context7**: 你可以通过 "use context7" 访问 Context7 MCP 以获取最新的官方文档和代码示例。当涉及第三方库（如 Tailwind, Next.js 等）的具体 API 时，优先使用 Context7 查阅最新文档，而不是依赖潜在过时的训练数据。
 
 你的任务是把需求落地为**达到生产环境标准**的代码。这意味着：代码必须包含完整的类型定义、错误处理、边界情况覆盖，并符合现代前端最佳实践。`,
     constraints: "你必须遵守以下约束：",
@@ -229,5 +226,3 @@ export const zh = {
     clarifying_header: "需要你先确认的问题",
   },
 };
-
-export type Locale = typeof zh;

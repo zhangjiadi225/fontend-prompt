@@ -1,6 +1,6 @@
 import { OptimizeArgs } from "../../types.js";
 import { buildWorkflowDefinition } from "./workflow.js";
-import { getLocale } from "../../i18n.js";
+import { DEFAULT_DATA } from "../default-data.js";
 
 /**
  * 构建结构化的输出模板（Markdown），这是提示词的核心部分
@@ -9,17 +9,17 @@ export function buildStructuredTemplate(args: OptimizeArgs) {
   const taskType = args.taskType ?? "new_feature";
   const requireApprovalGates = args.requireApprovalGates ?? true;
   const language = args.language ?? "ts";
-  const t = getLocale(args.outputLanguage).template;
+  const t = DEFAULT_DATA.template;
 
   const workflow = buildWorkflowDefinition(args);
 
-  const gateLine = t.gate_instruction(requireApprovalGates);
+  // Dynamic gate instruction based on enable/disable
+  const gateLine = requireApprovalGates
+    ? t.gate_instruction
+    : t.gate_disabled_instruction; // Using the new key for disabled instruction
 
   const base = [
     t.structure_header,
-    "## - Machine readable workflow",
-    `- mcp_workflow: ${JSON.stringify({ task_type: workflow.taskType, require_approval_gates: workflow.requireApprovalGates, gates: workflow.gates }, null, 0)}`,
-    `- gate_marker_prefix: ${workflow.gateMarker} id="..." action="WAIT_FOR_USER_APPROVAL">>>`,
     t.task_classification_header,
     `- task_type: <new_feature|optimize_existing|refactor|bugfix|performance|ui_polish|dependency_upgrade|test_addition>`,
     `- ${t.goal}: <...>`,
@@ -71,7 +71,7 @@ export function buildStructuredTemplate(args: OptimizeArgs) {
       t.code_output,
       "",
       "## 8. TypeScript Check",
-      t.ts_check(language === "ts"),
+      language === "ts" ? t.ts_check : t.ts_check_skip,
       "",
       '<<<MCP:GATE id="new_feature_accept" action="WAIT_FOR_USER_APPROVAL">>>',
       t.stop_generating,
@@ -106,7 +106,7 @@ export function buildStructuredTemplate(args: OptimizeArgs) {
       "",
       `## 8. ${t.wait_gate_title}`,
       t.code_output,
-      t.ts_check(language === "ts"),
+      language === "ts" ? t.ts_check : t.ts_check_skip,
       t.perf_compare,
     ].join("\n");
   }

@@ -1,12 +1,51 @@
 import { OptimizeArgs } from "../../types.js";
 import { includesAny } from "../../utils.js";
-import { getLocale } from "../../i18n.js";
+import { DEFAULT_DATA } from "../default-data.js";
+import * as fs from "fs";
+import * as path from "path";
+
+function loadLocalQuestions(): { id: string; question: string }[] | null {
+  try {
+    const filePath = path.join(
+      process.cwd(),
+      ".shared/frontend-prompt/data/questions.json",
+    );
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      return JSON.parse(content);
+    }
+  } catch (e) {
+    // Ignore
+  }
+  return null;
+}
 
 /**
  * 根据输入生成澄清问题
  */
 export function buildClarifyingQuestions(args: OptimizeArgs): string[] {
-  const t = getLocale(args.outputLanguage).questions;
+  const localQuestions = loadLocalQuestions();
+  let t = DEFAULT_DATA.questions;
+
+  // If local questions exist, we could potentially use them.
+  // However, the logic here relies on specific keys (framework, techStack, etc.) to trigger based on context.
+  // If user provides a custom questions.json, it's just a list of {id, question}.
+  // Mapping custom questions to logic is hard without a rules engine.
+  // Plan: For now, we use the default logic but pull the *text* from the loaded JSON if IDs match.
+  // If there are *new* IDs in local questions, we can't easily trigger them automatically without rules.
+  // So we only override the text of known IDs.
+
+  if (localQuestions) {
+    // Override default strings with local strings if ID matches
+    const newT = { ...t };
+    for (const q of localQuestions) {
+      if (q.id in newT) {
+        (newT as any)[q.id] = q.question;
+      }
+    }
+    t = newT;
+  }
+
   const questions: string[] = [];
   const prompt = (args.userPrompt ?? "").trim();
   const ctx = (args.projectContext ?? "").trim();

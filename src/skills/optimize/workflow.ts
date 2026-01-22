@@ -1,5 +1,23 @@
 import { OptimizeArgs, WorkflowGate, WorkflowStep } from "../../types.js";
-import { getLocale } from "../../i18n.js";
+import { DEFAULT_DATA } from "../default-data.js";
+import * as fs from "fs";
+import * as path from "path";
+
+function loadLocalGates(): Record<string, any> | null {
+  try {
+    const filePath = path.join(
+      process.cwd(),
+      ".shared/frontend-prompt/data/gates.json",
+    );
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      return JSON.parse(content);
+    }
+  } catch (e) {
+    // Ignore
+  }
+  return null;
+}
 
 /**
  * 构建工作流定义，包含审批关口（Gates）和步骤（Steps）
@@ -11,92 +29,49 @@ export function buildWorkflowDefinition(args: OptimizeArgs): {
   gates: WorkflowGate[];
   steps: WorkflowStep[];
 } {
-  const t = getLocale(args.outputLanguage).workflow;
+  const t = DEFAULT_DATA.workflow;
+  const localGates = loadLocalGates();
+  const gatesData = localGates || t.gates; // Use local or default
+
   const taskType = args.taskType ?? "new_feature";
   const requireApprovalGates = args.requireApprovalGates ?? true;
   const gateMarker = "<<<MCP:GATE";
 
+  // Reconstruct gates lists based on the data source
+  // The default data is flat map of ID -> Gate.
+  // We need to map task types to lists of gates.
+  // Hardcoding the relationship here as it correlates with steps logic which is code.
+  // If user provides local gates, they can follow the same ID structure.
+
+  // Helper to get gate by ID from the data source
+  const getGate = (id: string): WorkflowGate => {
+    const g = (gatesData as any)[id];
+    return {
+      id,
+      title: g?.title || id,
+      when: g?.when || "",
+    };
+  };
+
   const gatesByType: Record<string, WorkflowGate[]> = {
     new_feature: [
-      {
-        id: "new_feature_design",
-        title: t.gates.new_feature_design.title,
-        when: t.gates.new_feature_design.when,
-      },
-      {
-        id: "new_feature_plan",
-        title: t.gates.new_feature_plan.title,
-        when: t.gates.new_feature_plan.when,
-      },
-      {
-        id: "new_feature_accept",
-        title: t.gates.new_feature_accept.title,
-        when: t.gates.new_feature_accept.when,
-      },
+      getGate("new_feature_design"),
+      getGate("new_feature_plan"),
+      getGate("new_feature_accept"),
     ],
-    optimize_existing: [
-      {
-        id: "opt_change_doc",
-        title: t.gates.opt_change_doc.title,
-        when: t.gates.opt_change_doc.when,
-      },
-      {
-        id: "opt_plan",
-        title: t.gates.opt_plan.title,
-        when: t.gates.opt_plan.when,
-      },
-    ],
-    refactor: [
-      {
-        id: "refactor_doc",
-        title: t.gates.refactor_doc.title,
-        when: t.gates.refactor_doc.when,
-      },
-      {
-        id: "refactor_migration",
-        title: t.gates.refactor_migration.title,
-        when: t.gates.refactor_migration.when,
-      },
-    ],
-    bugfix: [
-      {
-        id: "bugfix_plan",
-        title: t.gates.bugfix_plan.title,
-        when: t.gates.bugfix_plan.when,
-      },
-    ],
-    performance: [
-      {
-        id: "perf_plan",
-        title: t.gates.perf_plan.title,
-        when: t.gates.perf_plan.when,
-      },
-    ],
-    ui_polish: [
-      {
-        id: "ui_polish_plan",
-        title: t.gates.ui_polish_plan.title,
-        when: t.gates.ui_polish_plan.when,
-      },
-    ],
-    dependency_upgrade: [
-      {
-        id: "dep_upgrade_plan",
-        title: t.gates.dep_upgrade_plan.title,
-        when: t.gates.dep_upgrade_plan.when,
-      },
-    ],
-    test_addition: [
-      {
-        id: "test_plan",
-        title: t.gates.test_plan.title,
-        when: t.gates.test_plan.when,
-      },
-    ],
+    optimize_existing: [getGate("opt_change_doc"), getGate("opt_plan")],
+    refactor: [getGate("refactor_doc"), getGate("refactor_migration")],
+    bugfix: [getGate("bugfix_plan")],
+    performance: [getGate("perf_plan")],
+    ui_polish: [getGate("ui_polish_plan")],
+    dependency_upgrade: [getGate("dep_upgrade_plan")],
+    test_addition: [getGate("test_plan")],
   };
 
   const gates = gatesByType[taskType] ?? gatesByType.new_feature;
 
+  // Ideally steps should also be data-driven, but for now we keep them in code using default strings
+  // to avoid over-complicating the verification.
   const steps: WorkflowStep[] = [
     { id: "task_classification", title: t.steps.task_classification },
     { id: "project_understanding", title: t.steps.project_understanding },

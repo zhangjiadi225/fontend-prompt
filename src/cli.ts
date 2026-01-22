@@ -101,6 +101,25 @@ cli
     }
   });
 
+import { handleInit } from "./skills/init.js";
+
+cli
+  .command("init", "初始化 AI 助手配置")
+  .option("--ai <provider>", "选择 AI 助手 (例: antigravity)")
+  .option("--force", "覆盖已存在的文件")
+  .action(async (options) => {
+    if (!options.ai) {
+      console.error(
+        "请指定 --ai 参数 (例: frontend-prompt init --ai antigravity)",
+      );
+      process.exit(1);
+    }
+    await handleInit({
+      ai: options.ai,
+      force: options.force,
+    });
+  });
+
 cli.help();
 cli.version(version);
 
