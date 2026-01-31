@@ -10,7 +10,7 @@ import { DEFAULT_DATA } from "./default-data.js";
 import { generateSkillScripts } from "./init-scripts.js";
 
 // SKILL.md 模板 - 符合 Antigravity Skills 官方规范
-const SKILL_MD_CONTENT = `---
+const ANTIGRAVITY_SKILL_MD_CONTENT = `---
 name: frontend-prompt
 description: 前端开发辅助 Skill。将模糊需求转化为结构化开发方案，自动检测项目技术栈，生成审批流、工作流和澄清问题。Use when starting frontend development tasks like adding pages, fixing bugs, or optimizing code.
 ---
@@ -87,14 +87,174 @@ node .agent/skills/frontend-prompt/scripts/index.js search "<关键词>"
 常见的 gate 节点包括：设计方案确认、开发计划确认、变更说明确认等。
 `;
 
+// Claude Code Skill 模板
+const CLAUDE_CODE_SKILL_CONTENT = `# Frontend Prompt - 前端开发意图对齐工具
+
+Transform vague frontend requirements into structured, intent-aligned development plans with zero token consumption through local analysis.
+
+## When to use this skill
+
+Use this skill proactively when:
+- User requests frontend development tasks (new features, bug fixes, refactoring, UI optimization)
+- Requirements are vague or need clarification before implementation
+- You need to understand the project's tech stack automatically
+- You want to generate structured prompts with intent alignment (A-B-C format)
+
+## How it works
+
+This skill uses the \`frontend-prompt\` CLI tool to:
+1. **Auto-detect** the current project's tech stack (framework, language, styling, etc.)
+2. **Transform** vague requirements into structured prompts using Intent Alignment methodology
+3. **Generate** A-B-C format output:
+   - **A. Intent Alignment**: One-sentence task summary
+   - **B. Crucial Validations**: High-risk confirmation items (only when ambiguous)
+   - **C. Refined Prompt**: Complete execution instructions with context
+
+## Usage
+
+### Basic usage
+
+When the user provides a frontend development request, run:
+
+\`\`\`bash
+frontend-prompt optimize "<user requirement>"
+\`\`\`
+
+### Optimized usage (recommended)
+
+To save context, request only the fields you need:
+
+\`\`\`bash
+frontend-prompt optimize "<user requirement>" --fields optimizedPrompt
+\`\`\`
+
+Available fields:
+- \`optimizedPrompt\`: The refined prompt with full context (most important)
+- \`workflow\`: Workflow metadata
+- \`checklist\`: Development checklist
+- \`meta\`: Project metadata (tech stack, etc.)
+- \`thought_trace\`: Analysis trace for debugging
+
+### Example workflow
+
+\`\`\`bash
+# User says: "Add a login page"
+frontend-prompt optimize "Add a login page" --fields optimizedPrompt
+
+# The tool will:
+# 1. Detect your project uses React + TypeScript + Tailwind
+# 2. Generate intent-aligned prompt with:
+#    - Clear task definition
+#    - Crucial validations (auth method, form validation, etc.)
+#    - Detailed implementation instructions
+# 3. You follow the "Refined Prompt" section to implement
+\`\`\`
+
+## Key principles
+
+When using this skill:
+
+1. **Always run optimize first** before starting implementation on frontend tasks
+2. **Follow the Refined Prompt** section in the output - it contains the complete, context-aware instructions
+3. **Address Crucial Validations** if present - these are high-risk items that need user confirmation
+4. **Trust the auto-detection** - the tool analyzes the project structure automatically
+
+## Installation
+
+The tool should be globally installed:
+
+\`\`\`bash
+npm install -g @jdzhang225gmail/frontend-prompt
+\`\`\`
+
+If not installed, you can use npx (slower):
+
+\`\`\`bash
+npx -y @jdzhang225gmail/frontend-prompt optimize "<requirement>"
+\`\`\`
+
+## Output format
+
+The optimize command returns JSON with this structure:
+
+\`\`\`json
+{
+  "optimizedPrompt": "# A. Intent Alignment\\n...\\n# B. Crucial Validations\\n...\\n# C. Refined Prompt\\n...",
+  "workflow": { "steps": [...], "estimatedComplexity": "..." },
+  "meta": { "detectedStack": {...}, "projectType": "..." }
+}
+\`\`\`
+
+Focus on the \`optimizedPrompt\` field - it contains the complete instructions you need to follow.
+`;
+
+// Helper function to get Claude Code skills directory
+async function getClaudeSkillsDir(): Promise<string> {
+  const homeDir = process.env.HOME || process.env.USERPROFILE;
+  if (!homeDir) {
+    throw new Error("Could not determine home directory");
+  }
+  return path.join(homeDir, ".claude", "skills");
+}
+
+// Handle Claude Code skill initialization
+async function handleClaudeCodeInit(args: InitArgs) {
+  try {
+    const skillsDir = await getClaudeSkillsDir();
+    const skillFilePath = path.join(skillsDir, "frontend-prompt.md");
+
+    // Create .claude/skills directory if it doesn't exist
+    await fs.mkdir(skillsDir, { recursive: true });
+    console.log(`✅ Ensured Claude skills directory exists: ${skillsDir}`);
+
+    // Check if skill file already exists
+    let shouldWriteSkill = true;
+    try {
+      await fs.access(skillFilePath);
+      // File exists
+      if (!args.force) {
+        console.warn(
+          `Skill file already exists at ${skillFilePath}. Use --force to overwrite.`,
+        );
+        shouldWriteSkill = false;
+      }
+    } catch {
+      // File does not exist, safe to write
+    }
+
+    if (shouldWriteSkill) {
+      await fs.writeFile(skillFilePath, CLAUDE_CODE_SKILL_CONTENT, "utf-8");
+      console.log(`✅ Generated Claude Code skill: ${skillFilePath}`);
+    }
+
+    console.log(
+      "\n🎉 Init complete! Claude Code skill has been installed to ~/.claude/skills/",
+    );
+    console.log(
+      "   Claude Code will automatically discover and use this skill when working on frontend tasks.\n",
+    );
+    console.log("💡 Usage: When you start a frontend task, Claude will automatically invoke this skill.");
+    console.log("   Or you can manually trigger it with: /frontend-prompt\n");
+  } catch (error: any) {
+    console.error("Failed to initialize Claude Code skill:", error.message);
+    process.exit(1);
+  }
+}
+
 export async function handleInit(args: InitArgs) {
   const cwd = process.cwd();
 
-  if (args.ai !== "antigravity") {
-    console.error("Currently only 'antigravity' is supported for --ai flag.");
+  if (args.ai !== "antigravity" && args.ai !== "claude-code") {
+    console.error("Currently only 'antigravity' and 'claude-code' are supported for --ai flag.");
     process.exit(1);
   }
 
+  // Handle Claude Code skill generation
+  if (args.ai === "claude-code") {
+    return handleClaudeCodeInit(args);
+  }
+
+  // Handle Antigravity skill generation
   try {
     // 1. 创建 .agent/skills/frontend-prompt 目录结构
     const skillDir = path.join(cwd, ".agent/skills/frontend-prompt");
@@ -125,7 +285,7 @@ export async function handleInit(args: InitArgs) {
     }
 
     if (shouldWriteSkillMd) {
-      await fs.writeFile(skillMdPath, SKILL_MD_CONTENT, "utf-8");
+      await fs.writeFile(skillMdPath, ANTIGRAVITY_SKILL_MD_CONTENT, "utf-8");
       console.log(`✅ Generated: ${skillMdPath}`);
     }
 

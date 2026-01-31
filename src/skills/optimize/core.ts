@@ -4,8 +4,6 @@ import {
   OptimizedPromptPackage,
 } from "../../types.js";
 import { buildWorkflowDefinition } from "./workflow.js";
-import { buildFrontendGuardrails } from "./guardrails.js";
-import { buildClarifyingQuestions } from "./questions.js";
 import { buildStructuredTemplate } from "./template.js";
 import { DEFAULT_DATA } from "../default-data.js";
 
@@ -25,17 +23,9 @@ export function buildOptimizedPromptPackage(
 
   const workflow = buildWorkflowDefinition(args);
 
-  const guardrails = buildFrontendGuardrails(args);
-  const clarifyingQuestions = buildClarifyingQuestions(args);
 
   const system: string[] = [];
   system.push(t.system_prompt);
-  system.push(t.constraints);
-  for (const g of guardrails) system.push(`- ${g}`);
-  system.push(`- ${t.task_type}: ${taskType}`);
-  system.push(
-    `- ${t.approval_gate}: ${requireApprovalGates ? t.gate_enabled : t.gate_disabled}`,
-  );
 
   const user: string[] = [];
   user.push(`## ${t.original_question}`);
@@ -44,22 +34,10 @@ export function buildOptimizedPromptPackage(
     user.push(`\n## ${t.project_context}`);
     user.push(args.projectContext.trim());
   }
-  user.push(`\n## ${t.expected_output}`);
-  user.push(t.output_intro);
-
-  user.push(`\n## ${t.output_format_req}`);
-  user.push(`- ${t.output_mode}: ${outputFormat}`);
-  user.push(`- ${t.code_style}: ${codeStyle}`);
-  user.push(`- ${t.must_include}`);
-  user.push(`- ${t.file_change}`);
 
   user.push(`\n## ${t.structured_template}`);
   user.push(buildStructuredTemplate(args));
 
-  if (mustAskClarifyingQuestions && clarifyingQuestions.length) {
-    user.push(`\n## ${t.clarifying_header}`);
-    for (const q of clarifyingQuestions) user.push(`- ${q}`);
-  }
 
   const messages: ChatMessage[] = [
     { role: "system", content: system.join("\n") },
@@ -81,8 +59,6 @@ export function buildOptimizedPromptPackage(
     optimizedPrompt,
     messages,
     workflow,
-    guardrails,
-    clarifyingQuestions,
     checklist,
     meta: {
       framework: args.framework ?? null,

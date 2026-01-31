@@ -24,14 +24,14 @@ export type OptimizeArgs = {
   constraints?: string[];
   /** 任务类型 */
   taskType?:
-    | "new_feature"
-    | "optimize_existing"
-    | "refactor"
-    | "bugfix"
-    | "performance"
-    | "ui_polish"
-    | "dependency_upgrade"
-    | "test_addition";
+  | "new_feature"
+  | "optimize_existing"
+  | "refactor"
+  | "bugfix"
+  | "performance"
+  | "ui_polish"
+  | "dependency_upgrade"
+  | "test_addition";
   /** 输出语言 */
   outputLanguage?: "zh" | "en";
   /** 输出格式 */
@@ -44,30 +44,13 @@ export type OptimizeArgs = {
   requireApprovalGates?: boolean;
 };
 
-export type WorkflowGate = {
-  id: string;
-  title: string;
-  when: string;
-};
-
-export type WorkflowStep = {
-  id: string;
-  title: string;
-  gateId?: string;
-};
 
 export interface OptimizedPromptPackage {
   optimizedPrompt: string;
   messages: ChatMessage[];
   workflow: {
     taskType: string;
-    requireApprovalGates: boolean;
-    gateMarker: string;
-    gates: WorkflowGate[];
-    steps: WorkflowStep[];
   };
-  guardrails: string[];
-  clarifyingQuestions: string[];
   checklist: string[];
   meta: {
     framework: string | null;

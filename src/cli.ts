@@ -2,7 +2,6 @@
 import { cac } from "cac";
 
 import { buildOptimizedPromptPackage } from "./skills/optimize/index.js";
-import { buildVerificationPrompt } from "./skills/verify.js";
 import { ProjectContext, detectProjectContext } from "./context-analyzer.js";
 import { OptimizeArgs } from "./types.js";
 import * as path from "path";
@@ -58,9 +57,7 @@ cli
         args,
         [
           "解析用户输入与参数",
-          "加载前端开发最佳实践守则 (Guardrails)",
           "识别任务类型并构建工作流 (Workflow)",
-          "生成澄清问题 (Clarifying Questions)",
           "组装最终 Prompt Package",
         ],
         result,
