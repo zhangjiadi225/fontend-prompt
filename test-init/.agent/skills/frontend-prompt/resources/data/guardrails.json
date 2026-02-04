@@ -1,0 +1,72 @@
+[
+  {
+    "id": "frontend_practice",
+    "content": "输出必须面向前端开发实践（UI、交互、状态、路由、可访问性、性能、工程化），不要泛泛而谈。",
+    "description": "frontend_practice"
+  },
+  {
+    "id": "no_fabrication",
+    "content": "如果关键信息不足，**严禁**凭空捏造业务逻辑，必须立刻停止并反问用户。",
+    "description": "no_fabrication"
+  },
+  {
+    "id": "no_new_deps",
+    "content": "禁止在没有明确理由的情况下引入新的 npm 包，优先使用原生 API 或现有依赖。",
+    "description": "no_new_deps"
+  },
+  {
+    "id": "no_placeholder",
+    "content": "禁止输出 '占位符' 代码（如 `// ...rest of code`），除非文件超过 200 行，否则必须输出完整代码。",
+    "description": "no_placeholder"
+  },
+  {
+    "id": "no_inline_logic",
+    "content": "禁止在 tsx/jsx 中编写内联长逻辑，必须提取为 hook 或 helper 函数。",
+    "description": "no_inline_logic"
+  },
+  {
+    "id": "executable_deliverable",
+    "content": "给出可执行的交付物（代码/文件结构/命令/步骤），避免只给概念。",
+    "description": "executable_deliverable"
+  },
+  {
+    "id": "maintainability",
+    "content": "优先考虑可维护性：类型、安全边界、错误处理、可测试性与可扩展性。",
+    "description": "maintainability"
+  },
+  {
+    "id": "security",
+    "content": "遵循安全与隐私：不要输出或要求提供密钥、token、个人敏感信息。",
+    "description": "security"
+  },
+  {
+    "id": "structured_output",
+    "content": "严格按要求的结构化模板输出；必须在需要审批的 gate 停止并等待用户确认。",
+    "description": "structured_output"
+  },
+  {
+    "id": "kiss",
+    "content": "**KISS 原则**: 优先选择最简单的实现方案。除非用户明确要求，否则**禁止**过度设计（如不必要的工厂模式、复杂的抽象层）。",
+    "description": "kiss"
+  },
+  {
+    "id": "no_assumptions",
+    "content": "**禁止隐性假设**: 如果需求未明确（如鉴权、样式库、错误处理），必须在“澄清问题”阶段询问，严禁根据“惯例”自作主张。",
+    "description": "no_assumptions"
+  },
+  {
+    "id": "ts_default",
+    "content": "默认使用 TypeScript，类型定义清晰，避免 any；必要时用类型收窄。",
+    "description": "ts_default"
+  },
+  {
+    "id": "framework_practice",
+    "content": "优先使用 {{framework}} 的最佳实践与官方推荐写法。",
+    "description": "framework_practice"
+  },
+  {
+    "id": "styling_req",
+    "content": "样式实现需符合：{{styling}}。",
+    "description": "styling_req"
+  }
+]

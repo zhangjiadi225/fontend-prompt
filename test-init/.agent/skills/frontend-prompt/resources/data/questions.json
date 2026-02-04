@@ -1,0 +1,46 @@
+[
+  {
+    "id": "framework",
+    "question": "你使用的前端框架/运行环境是什么？（React/Vue/Angular/Svelte/Next.js/Nuxt 等）"
+  },
+  {
+    "id": "techStack",
+    "question": "项目技术栈有哪些约束？（Vite/Webpack/Next、Node 版本、包管理器、Monorepo 等）"
+  },
+  {
+    "id": "language",
+    "question": "代码希望用 TypeScript 还是 JavaScript？"
+  },
+  {
+    "id": "styling",
+    "question": "样式/组件库有要求吗？（Tailwind/CSS Modules/SCSS/Styled-Components/Antd/MUI/Vanilla CSS 等）"
+  },
+  {
+    "id": "stateManagement",
+    "question": "状态管理方案是什么？（Redux/Zustand/Context/Pinia 等，或无需全局状态）"
+  },
+  {
+    "id": "router",
+    "question": "路由方案是什么？（React Router/Next App Router/Vue Router 等）"
+  },
+  {
+    "id": "api",
+    "question": "是否需要对接接口？若需要：接口协议（REST/GraphQL）、关键字段、错误码、鉴权方式是什么？"
+  },
+  {
+    "id": "a11y",
+    "question": "是否需要无障碍（a11y）要求？例如键盘可用、ARIA、对比度、读屏支持等。"
+  },
+  {
+    "id": "responsive",
+    "question": "需要响应式/移动端适配吗？支持哪些断点与浏览器范围？"
+  },
+  {
+    "id": "test",
+    "question": "需要测试吗？（单测/组件测试/E2E）使用什么测试框架？"
+  },
+  {
+    "id": "taskType",
+    "question": "本次属于哪种任务类型？（新功能开发/老功能优化/重构/修复 bug/性能优化/UI 打磨/依赖升级/补测试）"
+  }
+]

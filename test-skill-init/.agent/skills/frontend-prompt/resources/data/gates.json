@@ -1,0 +1,50 @@
+{
+  "new_feature_design": {
+    "title": "新功能设计方案",
+    "when": "设计方案完成后，开始开发方案/实现之前"
+  },
+  "new_feature_plan": {
+    "title": "开发方案与 TODO",
+    "when": "开发步骤与 TODO 列表输出后，开始写代码之前"
+  },
+  "new_feature_accept": {
+    "title": "交付与验收",
+    "when": "TS 校验/实现完成后，等待用户验收"
+  },
+  "opt_change_doc": {
+    "title": "变更说明文档",
+    "when": "Before/After/Scope 文档输出后，开始改代码之前"
+  },
+  "opt_plan": {
+    "title": "实施计划与 TODO",
+    "when": "实施计划输出后，开始改代码之前"
+  },
+  "refactor_doc": {
+    "title": "重构说明文档",
+    "when": "映射表与原则确定后，执行迁移之前"
+  },
+  "refactor_migration": {
+    "title": "迁移脚本/迁移方案",
+    "when": "脚本与运行方式确认后，执行迁移之前"
+  },
+  "bugfix_plan": {
+    "title": "修复方案",
+    "when": "根因定位后，开始改代码之前"
+  },
+  "perf_plan": {
+    "title": "性能优化方案",
+    "when": "指标与瓶颈确认后，开始改代码之前"
+  },
+  "ui_polish_plan": {
+    "title": "UI 调整方案",
+    "when": "问题清单确认后，开始改代码之前"
+  },
+  "dep_upgrade_plan": {
+    "title": "升级方案与回滚计划",
+    "when": "风险评估后，开始升级之前"
+  },
+  "test_plan": {
+    "title": "测试补充方案",
+    "when": "用例范围确认后，开始写测试之前"
+  }
+}
