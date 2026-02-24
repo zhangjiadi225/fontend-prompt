@@ -2,12 +2,15 @@
 
 这是一个**前端开发辅助 CLI 工具**。通过零 Token 消耗的本地分析，将模糊的需求转化为**Intent-Alignment (意图对齐)** 模式的专业 Prompt，供 Agent 或开发者直接使用。
 
-## 🌟 核心特性 (v1.1.0)
+## 🌟 核心特性 (v1.2.0)
 
 - **意图对齐模式**: 独创 "A-B-C" 结构输出 (Intent Alignment -> Crucial Validations -> Refined Prompt)，确保 AI 准确理解。
-- **纯 CLI 工具**: 无需常驻服务，极度轻量。
+- **自动任务类型识别**: 支持 8 种任务类型（new_feature / bugfix / performance / refactor / ui_polish / optimize_existing / dependency_upgrade / test_addition），通过关键词评分机制自动推断，无需手动指定。
+- **完整工作流步骤**: 每种任务类型对应专属的工作流步骤列表，含审批关口（isGate）标记。
+- **动态 Guardrails**: 根据检测到的技术栈（框架、语言、样式）动态生成开发守则列表。
+- **澄清问题生成**: 根据缺失的上下文信息自动生成需要向用户确认的问题列表。
+- **纯 CLI 工具**: 无需常驻服务，极度轻量，零 Token 消耗。
 - **环境感知**: 自动识别当前目录的技术栈（Framework, Language, Styling 等）。
-- **极简工作流**: 移除繁琐的审批关口 (Gates) 和正则逻辑，由大模型自主规划。
 - **双模式支持**: 既可作为 Antigravity Skill 自动调用，也可作为独立 CLI 跨平台使用。
 
 ---
@@ -50,7 +53,7 @@ frontend-prompt optimize "给后台增加一个用户管理页面"
 frontend-prompt optimize "Add login" --fields optimizedPrompt,workflow
 ```
 
-支持的字段：`optimizedPrompt`, `messages`, `workflow`, `checklist`, `meta`, `thought_trace`。
+支持的字段：`optimizedPrompt`, `messages`, `workflow`, `guardrails`, `clarifyingQuestions`, `checklist`, `meta`, `thought_trace`。
 
 ---
 

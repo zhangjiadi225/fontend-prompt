@@ -49,7 +49,7 @@ function search(query) {
     }
   }
 
-  // Search Gates
+  // Search Gates (gates.json is an object: { id: { title, when } })
   if (Array.isArray(GATES)) {
       for (const item of GATES) {
           const text = (item.title || '') + ' ' + (item.when || '');
@@ -59,14 +59,13 @@ function search(query) {
           }
       }
   } else {
-      // Gates is an object mapping task types to gate lists
-      for (const [key, gateList] of Object.entries(GATES)) {
-          for (const item of gateList) {
-             const text = (item.title || '') + ' ' + (item.when || '');
-             const score = calculateScore(text, tokens);
-             if (score > 0) {
-                 results.push({ type: 'gate', taskType: key, score, ...item });
-             }
+      // Gates is a flat object: { gateId: { title, when } }
+      for (const [key, gate] of Object.entries(GATES)) {
+          const item = gate;
+          const text = (item.title || '') + ' ' + (item.when || '');
+          const score = calculateScore(text, tokens);
+          if (score > 0) {
+              results.push({ type: 'gate', id: key, score, ...item });
           }
       }
   }
