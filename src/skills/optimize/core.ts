@@ -8,6 +8,43 @@ import { buildStructuredTemplate } from "./template.js";
 import { DEFAULT_DATA } from "../default-data.js";
 
 /**
+ * 根据上下文生成 guardrails 列表
+ */
+function buildGuardrails(args: OptimizeArgs): string[] {
+  const g = DEFAULT_DATA.guardrails;
+  const rails = [g.standard_practice, g.no_speculation, g.structured_output];
+
+  if (!args.language || args.language === "ts") {
+    rails.push(g.ts_default);
+  }
+  if (args.framework) {
+    rails.push(g.framework_practice.replace("{{framework}}", args.framework));
+  }
+  if (args.styling) {
+    rails.push(g.styling_req.replace("{{styling}}", args.styling));
+  }
+  return rails;
+}
+
+/**
+ * 根据缺失的上下文信息生成澄清问题列表
+ */
+function buildClarifyingQuestions(args: OptimizeArgs): string[] {
+  const q = DEFAULT_DATA.questions;
+  const questions: string[] = [];
+
+  if (!args.framework) questions.push(q.framework);
+  if (!args.techStack) questions.push(q.techStack);
+  if (!args.language) questions.push(q.language);
+  if (!args.styling) questions.push(q.styling);
+  if (!args.stateManagement) questions.push(q.stateManagement);
+  if (!args.router) questions.push(q.router);
+  questions.push(q.api);
+
+  return questions;
+}
+
+/**
  * 核心逻辑：将用户的 raw prompt 转换为优化的 prompt package。
  */
 export function buildOptimizedPromptPackage(
@@ -16,14 +53,18 @@ export function buildOptimizedPromptPackage(
   const outputLanguage = args.outputLanguage ?? "zh";
   const outputFormat = args.outputFormat ?? "both";
   const codeStyle = args.codeStyle ?? "diff";
-  const mustAskClarifyingQuestions = args.mustAskClarifyingQuestions ?? true;
-  const taskType = args.taskType ?? "new_feature";
   const requireApprovalGates = args.requireApprovalGates ?? true;
   const t = DEFAULT_DATA.core;
 
+  // 1. 构建工作流（含自动推断任务类型）
   const workflow = buildWorkflowDefinition(args);
+  const resolvedTaskType = workflow.taskType;
 
+  // 2. 构建 guardrails 和澄清问题
+  const guardrails = buildGuardrails(args);
+  const clarifyingQuestions = buildClarifyingQuestions(args);
 
+  // 3. 组装 system / user 消息
   const system: string[] = [];
   system.push(t.system_prompt);
 
@@ -36,8 +77,7 @@ export function buildOptimizedPromptPackage(
   }
 
   user.push(`\n## ${t.structured_template}`);
-  user.push(buildStructuredTemplate(args));
-
+  user.push(buildStructuredTemplate(args, resolvedTaskType));
 
   const messages: ChatMessage[] = [
     { role: "system", content: system.join("\n") },
@@ -59,6 +99,8 @@ export function buildOptimizedPromptPackage(
     optimizedPrompt,
     messages,
     workflow,
+    guardrails,
+    clarifyingQuestions,
     checklist,
     meta: {
       framework: args.framework ?? null,
@@ -67,7 +109,7 @@ export function buildOptimizedPromptPackage(
       styling: args.styling ?? null,
       stateManagement: args.stateManagement ?? null,
       router: args.router ?? null,
-      taskType,
+      taskType: resolvedTaskType,
       requireApprovalGates,
       outputLanguage,
       outputFormat,

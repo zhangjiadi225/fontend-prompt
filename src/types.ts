@@ -45,12 +45,23 @@ export type OptimizeArgs = {
 };
 
 
+export interface WorkflowStep {
+  id: string;
+  label: string;
+  isGate: boolean;
+  gateTitle?: string;
+  gateWhen?: string;
+}
+
 export interface OptimizedPromptPackage {
   optimizedPrompt: string;
   messages: ChatMessage[];
   workflow: {
     taskType: string;
+    steps: WorkflowStep[];
   };
+  guardrails: string[];
+  clarifyingQuestions: string[];
   checklist: string[];
   meta: {
     framework: string | null;
